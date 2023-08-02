@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Screen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #58ca11;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Send POST request to the authentication API
+            fetch('https://qa2.sunbasedata.com/sunbase/portal/api/assignment_auth.jsp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    login_id: email,
+                    password: password
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response.status === 401) {
+                    throw new Error('Invalid Authorization');
+                } else {
+                    throw new Error('Authentication Failed');
+                }
+            })
+            .then(data => {
+                // Save the bearer token in browser storage (sessionStorage)
+                sessionStorage.setItem('token', data.token);
+
+                // Redirect to the customer list screen
+                window.location.href = 'customer_list.html';
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        });
+    </script>
+</body>
+</html>
